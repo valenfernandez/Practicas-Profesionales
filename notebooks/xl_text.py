@@ -20,19 +20,6 @@ def excel_to_set(doc, first_cell, last_cell):
     return set(phrases)
 
 
-def excel_to_text(doc, first_cell, last_cell):
-    """ Esta funcion devuelve en forma de string los datos relevantes almacenados en un grupo de celdas de un excel
-        doc: string nombre del archivo excel a trabajar.
-        first_cell: primera celda del rango a copiar.
-        last_cell: ultima celda del rango a copiar
-        """
-    phrases = excel_to_set(doc, first_cell, last_cell)
-    text = ""
-    for phrase in phrases:
-        text += f'{phrase}\n'
-    return text
-
-
 def excel_to_data(doc, first_cell_num, last_cell_num, col_phrases, col_cats):
     """ Esta funcion devuelve una lista con todas las frases unicas encontradas en un rango de celdas de un excel
     y una lista con las categorias amenazante, no amenazante para cada una de estas frases.
@@ -49,16 +36,14 @@ def excel_to_data(doc, first_cell_num, last_cell_num, col_phrases, col_cats):
     sheet = excel_document[first_sheet]
     for i in range(first_cell_num, last_cell_num):
         cell = sheet[col_phrases + str(i)]
-        if cell.value and (cell.value != 'no corresponde') :
-            text = cell.value.replace('_', ' ')
-            if (text not in text_list):
-                cat_cell = sheet[col_cats + str(i)]
-                if cat_cell.value == 'amenazas':
-                    cats = {'AMENAZANTE': 1, 'NO_AMENAZANTE': 0}
-                else:
-                    cats = {'AMENAZANTE': 0, 'NO_AMENAZANTE': 1}
-                cat_list.append(cats)
-                text_list.append(text)
+        if cell.value :
+            cat_cell = sheet[col_cats + str(i)]
+            if cat_cell.value == 'A':
+                cats = {'AMENAZANTE': 1, 'NO_AMENAZANTE': 0}
+            else:
+                cats = {'AMENAZANTE': 0, 'NO_AMENAZANTE': 1}
+            cat_list.append(cats)
+            text_list.append(cell.value)
     return text_list, cat_list
 
 
@@ -75,6 +60,6 @@ def num_relevant_cells(doc, first_cell, last_cell):
     total = int(last_cell[1:]) - int(first_cell[1:])
     if total != 0:
         percentage = relevant_cells * 100 / total
-    print(f'el numero total de celdas: {total} \n'
-          f'el numero total de celdas con informacion unica: {relevant_cells}\n'
-          f'eso es un %{percentage:.2f} de celdas con informacion')
+    print(f'El numero total de celdas: {total} \n'
+          f'El numero total de celdas con informacion unica: {relevant_cells}\n'
+          f'Eso representa un %{percentage:.2f} de celdas con informacion')
